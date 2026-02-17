@@ -81,17 +81,34 @@ activities.addEventListener('change', (e) => {
 // PAYMENT METHODS
 // get payment method box, + the sections for each of the 3 payment methods
 const paymentMethod = document.getElementById('payment');
-const creditCard = document.getElementById('credit-card');
-const payPal = document.getElementById('paypal');
-const bitCoin = document.getElementById('bitcoin');
+
+const paymentSections = [
+    creditCard = document.getElementById('credit-card'),
+    payPal = document.getElementById('paypal'),
+    bitCoin = document.getElementById('bitcoin')
+]
+console.log(paymentSections[0]);
+console.log(paymentSections[1]);
+console.log(paymentSections[2]);
+
 // select the credit card payment option as default (which is the second child element)
 paymentMethod.children[1].selected = true;
 // display only the credit card section by default, by hiding the other
-payPal.hidden = true;
-bitCoin.hidden = true;
+paymentSections[1].hidden = true;
+paymentSections[2].hidden = true;
 // listen for the payment methods box being changed
 paymentMethod.addEventListener('change', (e) => {
     console.log(e.target.value);
-    // get the target value, then select the element with the same ID to visible, hide the others
+    // loop through the paymentSections array, if it's id attribute matches...
+    // ... the target value, then display the section, hide the others
+    for (i = 0; i < paymentSections.length; i++) {
+        console.log(paymentSections[i].getAttribute('id'));
+        if (paymentSections[i].getAttribute('id') === e.target.value) {
+            paymentSections[i].hidden = false;
+        } else {
+            paymentSections[i].hidden = true;
+        }
+
+    }
 
 });
