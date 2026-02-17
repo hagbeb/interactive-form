@@ -81,34 +81,151 @@ activities.addEventListener('change', (e) => {
 // PAYMENT METHODS
 // get payment method box, + the sections for each of the 3 payment methods
 const paymentMethod = document.getElementById('payment');
-
-const paymentSections = [
-    creditCard = document.getElementById('credit-card'),
-    payPal = document.getElementById('paypal'),
-    bitCoin = document.getElementById('bitcoin')
-]
-console.log(paymentSections[0]);
-console.log(paymentSections[1]);
-console.log(paymentSections[2]);
+creditCard = document.getElementById('credit-card');
+payPal = document.getElementById('paypal');
+bitCoin = document.getElementById('bitcoin');
 
 // select the credit card payment option as default (which is the second child element)
 paymentMethod.children[1].selected = true;
 // display only the credit card section by default, by hiding the other
-paymentSections[1].hidden = true;
-paymentSections[2].hidden = true;
+payPal.hidden = true;
+bitCoin.hidden = true;
+
+// function to check if the id of the payment section matches the value of the changed element
+function displayPaymentSection(section, changedElement) {
+    // if so display it, if not hide it
+    if (section.getAttribute('id') === changedElement) {
+        section.hidden = false;
+    } else {
+        section.hidden = true;
+    }
+}
 // listen for the payment methods box being changed
 paymentMethod.addEventListener('change', (e) => {
-    console.log(e.target.value);
-    // loop through the paymentSections array, if it's id attribute matches...
-    // ... the target value, then display the section, hide the others
-    for (i = 0; i < paymentSections.length; i++) {
-        console.log(paymentSections[i].getAttribute('id'));
-        if (paymentSections[i].getAttribute('id') === e.target.value) {
-            paymentSections[i].hidden = false;
-        } else {
-            paymentSections[i].hidden = true;
-        }
+    // run the function for each of the payment sections, to display or hide them
+    displayPaymentSection(creditCard, e.target.value);
+    displayPaymentSection(payPal, e.target.value);
+    displayPaymentSection(bitCoin, e.target.value);
+});
 
+/***
+ * FORM VALIDATION
+ ***/
+// store the regex for testing the email
+const emailRegex = /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/i;
+// get and store the credit card detail elements
+const cardNumber = document.getElementById('cc-num');
+const zipCode = document.getElementById('zip');
+const cvv = document.getElementById('cvv');
+// get the checkbox elements inside the 'activities' box
+const checkboxes = activities.querySelectorAll('[type="checkbox"]');
+// function to add and remove valid/not valid classes + hint, depending if field is valid
+function valid(element, valid) {
+    // the 'hint' element for each field is the previous Sibling of the lastChild in all cases
+    // if element is valid
+    if(valid) {
+        // replace the 'valid' class with the 'not-valid' class on the parentElement 'activities'
+        element.classList.add('valid');
+        element.classList.remove('not-valid');
+        console.log('valid', element, element.lastChild); 
+        // hide the hint element by adding the 'hint' class, if not already present
+        if(element.lastChild.previousElementSibling.classList.contains('hint')) {
+          element.lastChild.previousElementSibling.classList.add('hint');
+        }
+    } else {
+        // replace the 'valid' class with the 'not-valid' class on the parentElement 'activities'
+        element.classList.add('not-valid');
+        element.classList.remove('valid');
+        // display the hint element by removing the 'hint' class which hides it
+        element.lastChild.previousElementSibling.classList.remove('hint');
+    }
+}
+
+// listen for the form's submit event
+document.querySelector('form').addEventListener('submit', (e) => {
+    console.log(e);
+    // if the name field is empty, prevent submit + run 'valid' function with 'false' value
+    // for all runs of the valid function, we pass in the parentElement of the input field
+    if (!e.target[1].value) {
+        e.preventDefault();
+        valid(e.target[1].parentElement, false);
+    } else {
+        // if field is not empty, run valid function to remove hint
+        valid(e.target[1].parentElement, true);
+    }
+    // check the email field is formatted correctly. 
+    // If not, prevent default + show error + hint using valid function
+    if(!emailRegex.test(e.target[2].value)) {
+        e.preventDefault();
+        valid(e.target[2].parentElement, false);
+    // if it's correct, hide error + hint
+    } else {
+        valid(e.target[2].parentElement, true);
+    }
+    // variable to record whether a checkbox has been checked
+    let checkboxChecked;
+    // loop through the checkboxes to check that at least one is checked
+    for (i = 0; i < checkboxes.length; i++) {
+        // if a checkbox is checked, record this, + break the loop 
+        if (checkboxes[i].checked) {
+            checkboxChecked = true;
+            break;
+        }
+    }
+    // if a checkbox isn't checked, prevent submit, add not-valid class + ...
+    // ... show error/hint using valid unction
+    if (!checkboxChecked) {
+        e.preventDefault();
+        valid(activities, false);
+    // if one is valid, run vavlid function to hide errors/hint
+    } else {
+        valid(activities, true);
+    }
+    // if 'credit card' is the selected payment method, check it's sub-fields
+    if(paymentMethod.value === 'credit-card') {
+        // if the card number doesn't have 13-16 numbers without spaces/other chars, prevent submt
+        // + run valid function to show error/hint
+        if(!/^\d{13,16}$/.test(cardNumber.value)) {
+            e.preventDefault();
+            valid(cardNumber.parentElement, false);
+        // if correct, run valid function to hide error/hint
+        } else {
+            valid(cardNumber.parentElement, true);
+        }
+        // prevent default if the submit field doesn't have 5 numbers,
+        // + run valid function to show error/hint
+        if(!/^\d{5}$/.test(zipCode.value)) {
+            e.preventDefault();
+            valid(zipCode.parentElement, false);
+        // if correct, hide error/hint
+        } else {
+            valid(zipCode.parentElement, true);
+        }
+        // prevent default if the cvv field doesn't have 3 numbers + run valid function
+        if(!/^\d{3}$/.test(cvv.value)) {
+            e.preventDefault();
+            valid(cvv.parentElement, false);
+        // if correct, run valid function to hide error/hint
+        } else {
+            valid(cvv.parentElement, true);
+        }
     }
 
 });
+
+/**
+ * ACTIVITIES
+ */
+
+// loop through checkboxes to add focus and blur listeners
+for (i = 0; i < checkboxes.length; i++) {
+    // add listener for focus event. When triggered, add 'focus' class to parent
+    checkboxes[i].addEventListener('focus', (e) => {
+        e.target.parentElement.classList.add('focus');
+    });
+    // add listener for blur event. When triggered, remove 'focus' class label currently...
+    // ...in possession of it
+    checkboxes[i].addEventListener('blur', (e) => {
+        document.querySelector('.focus').classList.remove('focus');
+    });
+}
