@@ -2,15 +2,15 @@
 const nameField = document.getElementById('name');
 nameField.focus();
 
+/***
+ * JOB ROLE FIELDS
+ ***/
+
 // get and hide the 'other-job-role' field
 const otherRoleField = document.getElementById('other-job-role');
 otherRoleField.hidden = true;
 
-/***
- * JOB ROLE 
- ***/
-
-// get job role field and listen for it changig
+// get job role field and listen for it changing
 const jobRole = document.getElementById('title');
 jobRole.addEventListener('change', (e) => {
     // If the jobRole field is set to 'other', display the 'Other Job Role' field
@@ -22,14 +22,16 @@ jobRole.addEventListener('change', (e) => {
     }
 });
 
+/***
+ * T-SHIRT COLOR AND DESIGN
+***/
+
 // get and disable the 'Color' dropdown. Also get its children
 const color = document.getElementById('color');
 color.setAttribute('disabled', 'true'); 
 colorChildren = color.children;
 
-/***
-* GET 'DESIGN DROPDOWN AND LISTEN FOR CHANGES'
-***/
+// get design dropdown and listen for changes
 const design = document.getElementById('design');
 design.addEventListener('change', (e) => {
     // enable the 'color' dropdown
@@ -50,7 +52,7 @@ design.addEventListener('change', (e) => {
                 firstOption = true;
             }
         } else {
-            // else, hide it
+            // if it doesn't match, hide it
             colorChildren[i].hidden = true;
         }
     }
@@ -58,13 +60,13 @@ design.addEventListener('change', (e) => {
 });
 
 /*** 
-* ACTIVITIES
+* ACTIVITIES - UPDATE TOTAL & PREVENT CONFLICTS
 ***/
 
 // store the element which displays the total, + create variable to track the total
 const displayTotal = document.getElementById('activities-cost');
 let total = 0;
-// get the activities fieldset, then listen for change
+// get the activities fieldset
 const activities = document.getElementById('activities');
 // get the checkbox elements inside the 'activities' box
 const checkboxes = activities.querySelectorAll('[type="checkbox"]');
@@ -85,7 +87,7 @@ function checkConflicts(element, time) {
                 checkboxes[i].disabled = true;
                 checkboxes[i].parentElement.classList.add('disabled');                   
             } else {
-                // if it was unchecked, enable the conflicts
+                // if it was unchecked, re-enable the previous conflicts
                 checkboxes[i].disabled = false;
                 checkboxes[i].parentElement.classList.remove('disabled');                      
             }
@@ -93,7 +95,7 @@ function checkConflicts(element, time) {
     }
 }
 
-// listen for a change in one of the activities checkboxes
+// listen for a change in one of the activities checkboxes, so we can pdate the total and prevent conflicts
 activities.addEventListener('change', (e) => {
     // if the event target was a checkbox
     if (e.target.type === 'checkbox') {
@@ -104,14 +106,14 @@ activities.addEventListener('change', (e) => {
         // if the checkbox is checked, add to total. If not, subtract from total
         if (e.target.checked === true)  {
             total += fieldCost;
-            // DISABLE CONFLICTS
+            // Check conflicts to disable any created by check
             checkConflicts(e.target, activityTime);
 
-        // if the checkbox was uncheed
+        // if the checkbox was unchecked
         } else {
             // reduce total from cost
             total = total - fieldCost;
-            // enable conflicts
+            // Check conflicts to enable any removed by check
             checkConflicts(e.target, activityTime);
         }
         // update the display of the total cost
@@ -135,7 +137,8 @@ paymentMethod.children[1].selected = true;
 payPal.hidden = true;
 bitCoin.hidden = true;
 
-// function to check if the id of the payment section matches the value of the changed element
+// function to diisplay the section for the appropriate payment method
+// It checks if the id of the payment section matches the value of the selected (on change below) element
 function displayPaymentSection(section, changedElement) {
     // if so display it, if not hide it
     if (section.getAttribute('id') === changedElement) {
@@ -156,15 +159,12 @@ paymentMethod.addEventListener('change', (e) => {
  * FORM VALIDATION
  ***/
 
+// FIELDS AND FUNCTIONS FOR TESTING FORM VALIDITY
+
 // store the regex for testing the email. This will be used in emailTest function
 const emailRegex = /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/i;
 
-/***
- * FIELDS AND FUNCTIONS FOR TESTING FIELD VALIDITY
- ***/ 
-
 // Create function to test validity of nameField's input 
-// function to test whether the nameField is valid
 function nameTest() {
     // if the nameField has no input, then test fails & return false; else return true
     if (!nameField.value) {
@@ -186,7 +186,7 @@ function emailTest() {
     }
     // if it is not empty, then test if the entered text matches the desired format
     else {
-        // If email not valid, set the message to the appropriate one, and return false; else true
+        // If email entered but not valid, set the message to the appropriate one, and return false; else true
         if(!emailRegex.test(emailField.value)) {
             emailMessage.textContent = 'Email address must be formatted correctly.';
             return false;
@@ -219,7 +219,7 @@ function zipCodeTest() {
         return true;
     }
 }
-// save cvv element to variable, + define functio to test validity of it's input
+// save cvv element to variable, + define function to test validity of it's input
 const cvv = document.getElementById('cvv');
 function cvvTest() {
     // if the cvv field doesn't have 3 numbers, return false; else true
@@ -231,8 +231,8 @@ function cvvTest() {
 }
 
 // function to add and remove valid/not valid classes + hint, depending if field is valid
+// we pass in the parent element for each input field, and whether it was valid (boolean)
 function valid(element, valid) {
-    // we passed in the parent element for each input field
     // the 'hint' element for each field is the previous Sibling of the lastChild in all cases
     // if element is valid
     if(valid) {
