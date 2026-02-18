@@ -91,6 +91,7 @@ function checkConflicts(element, time) {
     }
 }
 
+// listen for a change in one of the activities checkboxes
 activities.addEventListener('change', (e) => {
     // if the event target was a checkbox
     if (e.target.type === 'checkbox') {
@@ -172,16 +173,30 @@ function nameTest() {
     }
 }
 
-// save email field, and define function to test it's validity
+// save email field, and also get the element that displays the email message
 const emailField = document.getElementById('email');
+const emailMessage = document.getElementById('email-hint');
+console.log(emailMessage);
+// define function to test email's validity
 function emailTest() {
-      // If email not valid, return false; else true
-    if(!emailRegex.test(emailField.value)) {
+    // if the email field is empty, then ask the user to enter email address, and return false
+    if(!emailField.value) {
+        emailMessage.textContent = 'Please enter an email address.';
         return false;
-    } else {
-        return true;
     }
+    // if it is not empty, then test if the entered text matches the desired format
+    else {
+        // If email not valid, set the message to the appropriate one, and return false; else true
+        if(!emailRegex.test(emailField.value)) {
+            emailMessage.textContent = 'Email address must be formatted correctly.';
+            return false;
+        } else {
+            return true;
+        }
+    }
+  
 }
+
 
 // repeat for credit card detail elements, starting with card number
 const cardNumber = document.getElementById('cc-num');
@@ -241,14 +256,14 @@ function valid(element, valid) {
 }
 
 // function for checking whether the a field is valid. 
-// We pass in the field, and the test for that particular field
-// We also pass in the event + event type, so we can prevent default if it was submit event
-function checkField(field, test, e, eventType) {
+// We pass in the field, and the test for that particular field, + the event
+function checkField(field, test, e) {
     // for all runs of the valid function, we pass in the parentElement of the input field
     // if the validation test returns false
+    console.log(e);
     if (!test()) {
         // if the event was submit, then prevent default
-        if (eventType === 'submit') {
+        if (e.type === 'submit') {
             e.preventDefault();
         }
         valid(field.parentElement, false);
@@ -265,21 +280,21 @@ document.querySelector('form').addEventListener('input', (e) => {
         // if not, display/hide the error/hint 
     // if the name field triggered the event, check name field
     if (e.target === nameField) {
-        checkField(nameField, nameTest, e, 'input');
+        checkField(nameField, nameTest, e);
     }
     // if email field triggered the event, check email field
     if (e.target === emailField) {
-        checkField(emailField, emailTest, e, 'input');
+        checkField(emailField, emailTest, e,);
     }
     // repeat for card related fields
     if (e.target === cardNumber) {
-        checkField(cardNumber, cardNumberTest, e, 'input');
+        checkField(cardNumber, cardNumberTest, e);
     }
     if (e.target === zipCode) {
-        checkField(zipCode, zipCodeTest, e, 'input');
+        checkField(zipCode, zipCodeTest, e);
     }
     if (e.target === cvv) {
-        checkField(cvv, cvvTest, e, 'input');
+        checkField(cvv, cvvTest, e);
     }
 });
 
@@ -287,8 +302,8 @@ document.querySelector('form').addEventListener('input', (e) => {
 document.querySelector('form').addEventListener('submit', (e) => {
     // run checkField function on name and email fields
     // Pass in the field to check, the test to run, the event, and event type
-    checkField(nameField, nameTest, e, 'submit');
-    checkField(emailField, emailTest, e, 'submit');
+    checkField(nameField, nameTest, e);
+    checkField(emailField, emailTest, e);
     // variable to record whether a checkbox has been checked
     let checkboxChecked;
     // loop through the checkboxes to check that at least one is checked
@@ -310,9 +325,9 @@ document.querySelector('form').addEventListener('submit', (e) => {
     }
     // if 'credit card' is the selected payment method, check it's sub-fields
     if(paymentMethod.value === 'credit-card') {
-        checkField(cardNumber, cardNumberTest, e, 'submit');
-        checkField(zipCode, zipCodeTest, e, 'submit');
-        checkField(cvv, cvvTest, e, 'submit');
+        checkField(cardNumber, cardNumberTest, e);
+        checkField(zipCode, zipCodeTest, e);
+        checkField(cvv, cvvTest, e);
     }
 });
 
