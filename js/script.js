@@ -261,16 +261,14 @@ function showValidity(element, valid) {
         // replace the 'not valid' class with the 'valid' class
         element.classList.add('valid');
         element.classList.remove('not-valid');
-        // hide the hint element by adding the 'hint' class
-        element.lastChild.previousElementSibling.classList.add('hint');
+        // hide the hint element 
+        element.lastElementChild.style.display = 'none';
     } else {
         // replace the 'valid' class with the 'not-valid' class
         element.classList.add('not-valid');
         element.classList.remove('valid');
-        // display the hint element by removing the 'hint' class which hides it
-        if(element.lastChild.previousElementSibling.classList.contains('hint')) {
-            element.lastChild.previousElementSibling.classList.remove('hint');
-        }
+        // display the hint element
+        element.lastElementChild.style.display = 'block';
     }
 }
 
