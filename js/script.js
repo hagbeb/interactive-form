@@ -1,17 +1,18 @@
-
-// get the text input, then give it focus
-const text = document.getElementById('name');
-console.log(text);
-text.focus();
+// save name element to variable, and give it focus
+const nameField = document.getElementById('name');
+nameField.focus();
 
 // get and hide the 'other-job-role' field
 const otherRoleField = document.getElementById('other-job-role');
 otherRoleField.hidden = true;
 
-// listen 
+/***
+ * JOB ROLE 
+ ***/
+
+// get job role field and listen for it changig
 const jobRole = document.getElementById('title');
 jobRole.addEventListener('change', (e) => {
-    console.log(e.target.value);
     // If the jobRole field is set to 'other', display the 'Other Job Role' field
     if(e.target.value === 'other') {
         otherRoleField.hidden = false;
@@ -20,14 +21,15 @@ jobRole.addEventListener('change', (e) => {
         otherRoleField.hidden = true;
     }
 });
-console.log(otherRoleField);
 
 // get and disable the 'Color' dropdown. Also get its children
 const color = document.getElementById('color');
 color.setAttribute('disabled', 'true'); 
 colorChildren = color.children;
 
-// get the 'Design' dropdown, and listen for changes. 
+/***
+* GET 'DESIGN DROPDOWN AND LISTEN FOR CHANGES'
+***/
 const design = document.getElementById('design');
 design.addEventListener('change', (e) => {
     // enable the 'color' dropdown
@@ -158,11 +160,10 @@ paymentMethod.addEventListener('change', (e) => {
 const emailRegex = /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/i;
 
 /***
- * STORE FIELD ELEMENTS WE WANT TO CHECK, + DEFINE FUNCTIONS TO TEST THEIR VALIDITY
+ * FIELDS AND FUNCTIONS FOR TESTING FIELD VALIDITY
  ***/ 
 
-// save name element to variable, and create function to test validity of it's input 
-const nameField = document.getElementById('name');
+// Create function to test validity of nameField's input 
 // function to test whether the nameField is valid
 function nameTest() {
     // if the nameField has no input, then test fails & return false; else return true
@@ -176,7 +177,6 @@ function nameTest() {
 // save email field, and also get the element that displays the email message
 const emailField = document.getElementById('email');
 const emailMessage = document.getElementById('email-hint');
-console.log(emailMessage);
 // define function to test email's validity
 function emailTest() {
     // if the email field is empty, then ask the user to enter email address, and return false
@@ -193,10 +193,8 @@ function emailTest() {
         } else {
             return true;
         }
-    }
-  
+    } 
 }
-
 
 // repeat for credit card detail elements, starting with card number
 const cardNumber = document.getElementById('cc-num');
@@ -241,7 +239,6 @@ function valid(element, valid) {
         // replace the 'valid' class with the 'not-valid' class
         element.classList.add('valid');
         element.classList.remove('not-valid');
-        console.log('valid', element, element.lastChild); 
         // hide the hint element by adding the 'hint' class, if not already present
         element.lastChild.previousElementSibling.classList.add('hint');
     } else {
@@ -260,7 +257,6 @@ function valid(element, valid) {
 function checkField(field, test, e) {
     // for all runs of the valid function, we pass in the parentElement of the input field
     // if the validation test returns false
-    console.log(e);
     if (!test()) {
         // if the event was submit, then prevent default
         if (e.type === 'submit') {
@@ -273,9 +269,11 @@ function checkField(field, test, e) {
     }
 }
 
-// listen for the input event on the form
+/***
+* LISTEN FOR FORM INPUT EVENT
+***/
+
 document.querySelector('form').addEventListener('input', (e) => {
-    console.log('form heard input');
     // if the field was one of the required fields, check whether it was valid
         // if not, display/hide the error/hint 
     // if the name field triggered the event, check name field
@@ -298,7 +296,10 @@ document.querySelector('form').addEventListener('input', (e) => {
     }
 });
 
-// listen for the form's submit event
+/***
+* LISTEN FOR FORM'S SUBMIT EVENT
+***/
+
 document.querySelector('form').addEventListener('submit', (e) => {
     // run checkField function on name and email fields
     // Pass in the field to check, the test to run, the event, and event type
