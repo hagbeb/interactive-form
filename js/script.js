@@ -179,7 +179,7 @@ function nameTest() {
     }
 }
 
-// save email field, and also get the element that displays the email message
+// save email field, and also get the element that displays the email message so we can change the message depending on error
 const emailField = document.getElementById('email');
 const emailMessage = document.getElementById('email-hint');
 // define function to test email's validity
@@ -277,7 +277,6 @@ function showValidity(element, valid) {
 // function for checking whether the a field is valid. 
 // We pass in the field, and the test for that particular field, + the event
 function checkField(field, test, e) {
-    // for all runs of the valid function, we pass in the parentElement of the input field
     // if the validation test returns false
     if (!test()) {
         // if the event was submit, then prevent default
@@ -285,7 +284,7 @@ function checkField(field, test, e) {
             e.preventDefault();
         }
         // display the not valid visuals
-        // we pass in the parentElement of the fields, as they display the messages.
+        // for all runs of the showValidity function, we pass in the field's parentElement, as they display the validation messages
         showValidity(field.parentElement, false);
     } else {
         // else ie the test passed, pass in 'true'
