@@ -55,30 +55,75 @@ design.addEventListener('change', (e) => {
     
 });
 
-// ACTIVITIES
+/*** 
+* ACTIVITIES
+***/
 
 // store the element which displays the total, + create variable to track the total
 const displayTotal = document.getElementById('activities-cost');
 let total = 0;
 // get the activities fieldset, then listen for change
 const activities = document.getElementById('activities');
+// get the checkbox elements inside the 'activities' box
+const checkboxes = activities.querySelectorAll('[type="checkbox"]');
+// variable to record the activity time as we loop through activities checked
+let activityTime = '';
+
+// function which checks if there are conflicts in the day and time of activities
+// we pass in the element checked/unchecked, it's activityTIme, + whether it was checked or unchkcd
+function checkConflicts(element, time, checked) {
+    // loop through the activities to check their are no time clashes. Start at 1
+    for (i = 0; i < checkboxes.length; i++) {
+        // if there's a conflict (ie if the checkboxes are not the same, and the ...
+        // ... activityTime matches another checkboxes day and time)
+        if (element !== checkboxes[i] && time === checkboxes[i].dataset.dayAndTime) {
+            // if the element passed in was checked, disable the conflicts
+            if(checked) {
+                // disable the conflicting checkbox & add disabled class to parent
+                checkboxes[i].disabled = true;
+                checkboxes[i].parentElement.classList.add('disabled');                   
+            } else {
+                // if it was unchecked, enable the conflicts
+                checkboxes[i].disabled = false;
+                checkboxes[i].parentElement.classList.remove('disabled');                      
+            }
+
+        }     
+    }
+}
+
 activities.addEventListener('change', (e) => {
     // if the event target was a checkbox
     if (e.target.type === 'checkbox') {
         // get the value of the checkboxes item from data-cost attr, converting it to a number 
         const fieldCost = parseInt(e.target.dataset.cost);
+        // store the date/time of the checkbox label using the data attribute
+        activityTime = e.target.dataset.dayAndTime;
         // if the checkbox is checked, add to total. If not, subtract from total
         if (e.target.checked === true)  {
             total += fieldCost;
+            // DISABLE CONFLICTS
+            checkConflicts(e.target, activityTime, true);
+
+        // if the checkbox was uncheed
         } else {
+            // reduce total from cost
             total = total - fieldCost;
+            // enable conflicts
+            checkConflicts(e.target, activityTime, false);
         }
         // update the display of the total cost
         displayTotal.textContent = `Total: $${total}`;
+
+
+
     }
 });
 
-// PAYMENT METHODS
+/***
+ * PAYMENT METHODS
+ ***/
+
 // get payment method box, + the sections for each of the 3 payment methods
 const paymentMethod = document.getElementById('payment');
 creditCard = document.getElementById('credit-card');
@@ -111,20 +156,21 @@ paymentMethod.addEventListener('change', (e) => {
 /***
  * FORM VALIDATION
  ***/
+
 // store the regex for testing the email
 const emailRegex = /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/i;
 // get and store the credit card detail elements
 const cardNumber = document.getElementById('cc-num');
 const zipCode = document.getElementById('zip');
 const cvv = document.getElementById('cvv');
-// get the checkbox elements inside the 'activities' box
-const checkboxes = activities.querySelectorAll('[type="checkbox"]');
+
 // function to add and remove valid/not valid classes + hint, depending if field is valid
 function valid(element, valid) {
+    // we passed in the parent element for each input field
     // the 'hint' element for each field is the previous Sibling of the lastChild in all cases
     // if element is valid
     if(valid) {
-        // replace the 'valid' class with the 'not-valid' class on the parentElement 'activities'
+        // replace the 'valid' class with the 'not-valid' class
         element.classList.add('valid');
         element.classList.remove('not-valid');
         console.log('valid', element, element.lastChild); 
