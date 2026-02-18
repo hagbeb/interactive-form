@@ -153,29 +153,23 @@ paymentMethod.addEventListener('change', (e) => {
  * FORM VALIDATION
  ***/
 
-// store the regex for testing the email. This will be used in emailTest function
+// store the regex for testing the email
 const emailRegex = /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/i;
-
-/***
- * STORE FIELD ELEMENTS WE WANT TO CHECK, + DEFINE FUNCTIONS TO TEST THEIR VALIDITY
- ***/ 
-
-// save name element to variable, and create function to test validity of it's input 
+// get and store the field elements we want to check
+// name, email, 
 const nameField = document.getElementById('name');
 // function to test whether the nameField is valid
 function nameTest() {
-    // if the nameField has no input, then test fails & return false; else return true
+    // if the nameField has no input, then test fails ie it's not valid
     if (!nameField.value) {
         return false;
     } else {
         return true;
     }
 }
-
-// save email field, and define function to test it's validity
 const emailField = document.getElementById('email');
 function emailTest() {
-      // If email not valid, return false; else true
+      // If email not valid, 
     if(!emailRegex.test(emailField.value)) {
         return false;
     } else {
@@ -183,35 +177,33 @@ function emailTest() {
     }
 }
 
-// repeat for credit card detail elements, starting with card number
+// credit card detail elements
 const cardNumber = document.getElementById('cc-num');
-// test card number
 function cardNumberTest() {
+    console.log('running cardNumberTest');
     // if the card number doesn't have 13-16 numbers without spaces/other chars, return false
+    console.log('cardNumber value', cardNumber.value);
     if(!/^\d{13,16}$/.test(cardNumber.value)) {
         return false;
-    // else true
     } else {
         return true;
     }
 }
-
-// save zipCode element, and define function to test it's validity
 const zipCode = document.getElementById('zip');
 function zipCodeTest() {
-    // if the zipCode isn't 5 digits, return false; else true
     if(!/^\d{5}$/.test(zipCode.value)) {
         return false;
+    // if correct, hide error/hint
     } else {
-        return true;
+    return true;
     }
 }
-// save cvv element to variable, + define functio to test validity of it's input
 const cvv = document.getElementById('cvv');
 function cvvTest() {
-    // if the cvv field doesn't have 3 numbers, return false; else true
+        // prevent default if the cvv field doesn't have 3 numbers + run valid function
     if(!/^\d{3}$/.test(cvv.value)) {
         return false;
+    // if correct, run valid function to hide error/hint
     } else {
         return true;
     }
@@ -258,7 +250,9 @@ function checkField(field, test, e, eventType) {
     }
 }
 
-// listen for the input event on the form
+
+
+// listen for the input event on the from
 document.querySelector('form').addEventListener('input', (e) => {
     console.log('form heard input');
     // if the field was one of the required fields, check whether it was valid
@@ -267,7 +261,7 @@ document.querySelector('form').addEventListener('input', (e) => {
     if (e.target === nameField) {
         checkField(nameField, nameTest, e, 'input');
     }
-    // if email field triggered the event, check email field
+    // if email triggered event, check email field
     if (e.target === emailField) {
         checkField(emailField, emailTest, e, 'input');
     }
@@ -285,9 +279,10 @@ document.querySelector('form').addEventListener('input', (e) => {
 
 // listen for the form's submit event
 document.querySelector('form').addEventListener('submit', (e) => {
-    // run checkField function on name and email fields
-    // Pass in the field to check, the test to run, the event, and event type
+    console.log(e);
+    // if the name field is empty, prevent submit + run 'valid' function with 'false' value
     checkField(nameField, nameTest, e, 'submit');
+    // check the email field is formatted correctly. 
     checkField(emailField, emailTest, e, 'submit');
     // variable to record whether a checkbox has been checked
     let checkboxChecked;
@@ -314,6 +309,7 @@ document.querySelector('form').addEventListener('submit', (e) => {
         checkField(zipCode, zipCodeTest, e, 'submit');
         checkField(cvv, cvvTest, e, 'submit');
     }
+
 });
 
 /**
