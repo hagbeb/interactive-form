@@ -68,9 +68,6 @@ const displayTotal = document.getElementById('activities-cost');
 let total = 0;
 // get the activities fieldset
 const activities = document.getElementById('activities');
-// also get an element inside it, so we can pass this to 'checkField' function, which passes in its parent when calling 'showValidity'
-// doing this means that the correct parentElement (ie activities) will be called by checkField later
-const activitiesBox = document.getElementById('activities-box');
 // get the checkbox elements inside the 'activities' box
 const checkboxes = activities.querySelectorAll('[type="checkbox"]');
 // variable to record the activity time as we loop through activities checked
@@ -103,7 +100,7 @@ activities.addEventListener('change', (e) => {
     // if the event target was a checkbox
     if (e.target.type === 'checkbox') {
         // check if any checkbox is checked, display validation errors if not
-        checkField(activitiesBox, checkboxesTest, e);
+        checkField(activities, checkboxesTest, e);
         // get the value of the checkboxes item from data-cost attr, converting it to a number 
         const fieldCost = parseInt(e.target.dataset.cost);
         // store the date/time of the checkbox label using the data attribute
@@ -138,11 +135,11 @@ bitCoin = document.getElementById('bitcoin');
 
 // select the credit card payment option as default (which is the second child element)
 paymentMethod.children[1].selected = true;
-// display only the credit card section by default, by hiding the others
+// display only the credit card section by default, by hiding the other
 payPal.hidden = true;
 bitCoin.hidden = true;
 
-// function to display the section for the appropriate payment method
+// function to diisplay the section for the appropriate payment method
 // It checks if the id of the payment section matches the value of the selected (on change below) element
 function displayPaymentSection(section, changedElement) {
     // if so display it, if not hide it
@@ -252,9 +249,8 @@ function cvvTest() {
  ***/
 
 // function adds and removes valid/not valid classes + hint, depending if field is valid
-// we pass in the parent element for each input field, as that is the element which displays the messages
-// we also pass in whether it was valid (boolean)
-function showValidity(element, valid) {
+// we pass in the parent element for each input field, and whether it was valid (boolean)
+function valid(element, valid) {
     // the 'hint' element for each field is the previous Sibling of the lastChild in all cases
     // if element is valid
     if(valid) {
@@ -285,11 +281,22 @@ function checkField(field, test, e) {
             e.preventDefault();
         }
         // display the not valid visuals
-        // we pass in the parentElement of the fields, as they display the messages.
-        showValidity(field.parentElement, false);
+        // we pass in the parentElement for most fields, as the display the messages. The exception is for testing the activities...
+        // ...checkboxes, where we pass in the parent element to start with
+        if (field === activities) {
+            console.log('true');
+            valid(field, false);
+        } else {
+            valid(field.parentElement, false);
+        }
     } else {
-        // else ie the test passed, pass in 'true'
-        showValidity(field.parentElement, true);
+        // if field is not empty, run valid function to remove hint. Pass in the field for activities, parentElement for the others
+        if (field === activities) {
+            console.log('false');
+            valid(field, true);
+        } else {
+            valid(field.parentElement, true);
+        }
     }
 }
 
@@ -298,6 +305,7 @@ function checkField(field, test, e) {
 ***/
 
 document.querySelector('form').addEventListener('input', (e) => {
+    console.log(e.target);
     // if the field was one of the required fields, check whether it was valid
     // if not, display/hide the error/hint 
     // if the name field triggered the event, check name field
@@ -325,13 +333,22 @@ document.querySelector('form').addEventListener('input', (e) => {
 ***/
 
 document.querySelector('form').addEventListener('submit', (e) => {
-    // run checkField function on name and email fields, and the checkboxes
+    // run checkField function on name and email fields, and the activities section
     // Pass in the field to check, the test to run, and the event
     checkField(nameField, nameTest, e);
     checkField(emailField, emailTest, e);
-    // for checking the checkboxes, since 'checkField' will pass in the field's parent element to 'showValidity', we need to ....
-    // ...pass in a child of the 'activities' section. This is the use for activitiesBox
-    checkField(activitiesBox, checkboxesTest, e);
+    checkField(activities, checkboxesTest, e);
+    /*
+    // if a checkbox isn't checked, prevent submit, add not-valid class + ...
+    // ... show error/hint using valid function
+    if (!checkboxChecked) {
+        e.preventDefault();
+        valid(activities, false);
+    // if one is valid, run valid function to hide errors/hint
+    } else {
+        valid(activities, true);
+    }
+    */
     // if 'credit card' is the selected payment method, check it's sub-fields
     if(paymentMethod.value === 'credit-card') {
         checkField(cardNumber, cardNumberTest, e);

@@ -1,17 +1,18 @@
+// save name element to variable, and give it focus
+const nameField = document.getElementById('name');
+nameField.focus();
 
-// get the text input, then give it focus
-const text = document.getElementById('name');
-console.log(text);
-text.focus();
+/***
+ * JOB ROLE FIELDS
+ ***/
 
 // get and hide the 'other-job-role' field
 const otherRoleField = document.getElementById('other-job-role');
 otherRoleField.hidden = true;
 
-// listen 
+// get job role field and listen for it changing
 const jobRole = document.getElementById('title');
 jobRole.addEventListener('change', (e) => {
-    console.log(e.target.value);
     // If the jobRole field is set to 'other', display the 'Other Job Role' field
     if(e.target.value === 'other') {
         otherRoleField.hidden = false;
@@ -20,14 +21,17 @@ jobRole.addEventListener('change', (e) => {
         otherRoleField.hidden = true;
     }
 });
-console.log(otherRoleField);
+
+/***
+ * T-SHIRT COLOR AND DESIGN
+***/
 
 // get and disable the 'Color' dropdown. Also get its children
 const color = document.getElementById('color');
 color.setAttribute('disabled', 'true'); 
 colorChildren = color.children;
 
-// get the 'Design' dropdown, and listen for changes. 
+// get design dropdown and listen for changes
 const design = document.getElementById('design');
 design.addEventListener('change', (e) => {
     // enable the 'color' dropdown
@@ -48,7 +52,7 @@ design.addEventListener('change', (e) => {
                 firstOption = true;
             }
         } else {
-            // else, hide it
+            // if it doesn't match, hide it
             colorChildren[i].hidden = true;
         }
     }
@@ -56,13 +60,13 @@ design.addEventListener('change', (e) => {
 });
 
 /*** 
-* ACTIVITIES
+* ACTIVITIES - UPDATE TOTAL & PREVENT CONFLICTS
 ***/
 
 // store the element which displays the total, + create variable to track the total
 const displayTotal = document.getElementById('activities-cost');
 let total = 0;
-// get the activities fieldset, then listen for change
+// get the activities fieldset
 const activities = document.getElementById('activities');
 // get the checkbox elements inside the 'activities' box
 const checkboxes = activities.querySelectorAll('[type="checkbox"]');
@@ -83,7 +87,7 @@ function checkConflicts(element, time) {
                 checkboxes[i].disabled = true;
                 checkboxes[i].parentElement.classList.add('disabled');                   
             } else {
-                // if it was unchecked, enable the conflicts
+                // if it was unchecked, re-enable the previous conflicts
                 checkboxes[i].disabled = false;
                 checkboxes[i].parentElement.classList.remove('disabled');                      
             }
@@ -91,6 +95,7 @@ function checkConflicts(element, time) {
     }
 }
 
+// listen for a change in one of the activities checkboxes, so we can pdate the total and prevent conflicts
 activities.addEventListener('change', (e) => {
     // if the event target was a checkbox
     if (e.target.type === 'checkbox') {
@@ -101,14 +106,14 @@ activities.addEventListener('change', (e) => {
         // if the checkbox is checked, add to total. If not, subtract from total
         if (e.target.checked === true)  {
             total += fieldCost;
-            // DISABLE CONFLICTS
+            // Check conflicts to disable any created by check
             checkConflicts(e.target, activityTime);
 
-        // if the checkbox was uncheed
+        // if the checkbox was unchecked
         } else {
             // reduce total from cost
             total = total - fieldCost;
-            // enable conflicts
+            // Check conflicts to enable any removed by check
             checkConflicts(e.target, activityTime);
         }
         // update the display of the total cost
@@ -132,7 +137,8 @@ paymentMethod.children[1].selected = true;
 payPal.hidden = true;
 bitCoin.hidden = true;
 
-// function to check if the id of the payment section matches the value of the changed element
+// function to diisplay the section for the appropriate payment method
+// It checks if the id of the payment section matches the value of the selected (on change below) element
 function displayPaymentSection(section, changedElement) {
     // if so display it, if not hide it
     if (section.getAttribute('id') === changedElement) {
@@ -153,72 +159,90 @@ paymentMethod.addEventListener('change', (e) => {
  * FORM VALIDATION
  ***/
 
-// store the regex for testing the email
+// FIELDS AND FUNCTIONS FOR TESTING FORM VALIDITY
+
+// store the regex for testing the email. This will be used in emailTest function
 const emailRegex = /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/i;
-// get and store the field elements we want to check
-// name, email, 
-const nameField = document.getElementById('name');
-// function to test whether the nameField is valid
+
+// Create function to test validity of nameField's input 
 function nameTest() {
-    // if the nameField has no input, then test fails ie it's not valid
+    // if the nameField has no input, then test fails & return false; else return true
     if (!nameField.value) {
         return false;
     } else {
         return true;
     }
 }
+
+// save email field, and also get the element that displays the email message
 const emailField = document.getElementById('email');
+const emailMessage = document.getElementById('email-hint');
+// define function to test email's validity
 function emailTest() {
-      // If email not valid, 
-    if(!emailRegex.test(emailField.value)) {
+    // if the email field is empty, then ask the user to enter email address, and return false
+    if(!emailField.value) {
+        emailMessage.textContent = 'Please enter an email address.';
         return false;
-    } else {
-        return true;
     }
+    // if it is not empty, then test if the entered text matches the desired format
+    else {
+        // If email entered but not valid, set the message to the appropriate one, and return false; else true
+        if(!emailRegex.test(emailField.value)) {
+            emailMessage.textContent = 'Email address must be formatted correctly.';
+            return false;
+        } else {
+            return true;
+        }
+    } 
 }
 
-// credit card detail elements
+// repeat for credit card detail elements, starting with card number
 const cardNumber = document.getElementById('cc-num');
+// test card number
 function cardNumberTest() {
-    console.log('running cardNumberTest');
     // if the card number doesn't have 13-16 numbers without spaces/other chars, return false
-    console.log('cardNumber value', cardNumber.value);
     if(!/^\d{13,16}$/.test(cardNumber.value)) {
         return false;
-    } else {
-        return true;
-    }
-}
-const zipCode = document.getElementById('zip');
-function zipCodeTest() {
-    if(!/^\d{5}$/.test(zipCode.value)) {
-        return false;
-    // if correct, hide error/hint
-    } else {
-    return true;
-    }
-}
-const cvv = document.getElementById('cvv');
-function cvvTest() {
-        // prevent default if the cvv field doesn't have 3 numbers + run valid function
-    if(!/^\d{3}$/.test(cvv.value)) {
-        return false;
-    // if correct, run valid function to hide error/hint
+    // else true
     } else {
         return true;
     }
 }
 
-// function to add and remove valid/not valid classes + hint, depending if field is valid
+// save zipCode element, and define function to test it's validity
+const zipCode = document.getElementById('zip');
+function zipCodeTest() {
+    // if the zipCode isn't 5 digits, return false; else true
+    if(!/^\d{5}$/.test(zipCode.value)) {
+        return false;
+    } else {
+        return true;
+    }
+}
+// save cvv element to variable, + define function to test validity of it's input
+const cvv = document.getElementById('cvv');
+function cvvTest() {
+    // if the cvv field doesn't have 3 numbers, return false; else true
+    if(!/^\d{3}$/.test(cvv.value)) {
+        return false;
+    } else {
+        return true;
+    }
+}
+
+/***
+ * FUNCTION FOR DISPLAYING VALIDATION ERRORS
+ ***/
+
+// function adds and removes valid/not valid classes + hint, depending if field is valid
+// we pass in the parent element for each input field, and whether it was valid (boolean)
 function valid(element, valid) {
-    // we passed in the parent element for each input field
     // the 'hint' element for each field is the previous Sibling of the lastChild in all cases
     // if element is valid
     if(valid) {
-        // replace the 'valid' class with the 'not-valid' class
+        // replace the 'not valid' class with the 'valid' class
         element.classList.add('valid');
         element.classList.remove('not-valid');
-        console.log('valid', element, element.lastChild); 
         // hide the hint element by adding the 'hint' class, if not already present
         element.lastChild.previousElementSibling.classList.add('hint');
     } else {
@@ -233,16 +257,16 @@ function valid(element, valid) {
 }
 
 // function for checking whether the a field is valid. 
-// We pass in the field, and the test for that particular field
-// We also pass in the event + event type, so we can prevent default if it was submit event
-function checkField(field, test, e, eventType) {
+// We pass in the field, and the test for that particular field, + the event
+function checkField(field, test, e) {
     // for all runs of the valid function, we pass in the parentElement of the input field
     // if the validation test returns false
     if (!test()) {
         // if the event was submit, then prevent default
-        if (eventType === 'submit') {
+        if (e.type === 'submit') {
             e.preventDefault();
         }
+        // display the not valid visuals
         valid(field.parentElement, false);
     } else {
         // if field is not empty, run valid function to remove hint
@@ -250,40 +274,42 @@ function checkField(field, test, e, eventType) {
     }
 }
 
+/***
+* LISTEN FOR FORM INPUT EVENT
+***/
 
-
-// listen for the input event on the from
 document.querySelector('form').addEventListener('input', (e) => {
-    console.log('form heard input');
     // if the field was one of the required fields, check whether it was valid
-        // if not, display/hide the error/hint 
+    // if not, display/hide the error/hint 
     // if the name field triggered the event, check name field
     if (e.target === nameField) {
-        checkField(nameField, nameTest, e, 'input');
+        checkField(nameField, nameTest, e);
     }
-    // if email triggered event, check email field
+    // if email field triggered the event, check email field
     if (e.target === emailField) {
-        checkField(emailField, emailTest, e, 'input');
+        checkField(emailField, emailTest, e,);
     }
     // repeat for card related fields
     if (e.target === cardNumber) {
-        checkField(cardNumber, cardNumberTest, e, 'input');
+        checkField(cardNumber, cardNumberTest, e);
     }
     if (e.target === zipCode) {
-        checkField(zipCode, zipCodeTest, e, 'input');
+        checkField(zipCode, zipCodeTest, e);
     }
     if (e.target === cvv) {
-        checkField(cvv, cvvTest, e, 'input');
+        checkField(cvv, cvvTest, e);
     }
 });
 
-// listen for the form's submit event
+/***
+* LISTEN FOR FORM'S SUBMIT EVENT
+***/
+
 document.querySelector('form').addEventListener('submit', (e) => {
-    console.log(e);
-    // if the name field is empty, prevent submit + run 'valid' function with 'false' value
-    checkField(nameField, nameTest, e, 'submit');
-    // check the email field is formatted correctly. 
-    checkField(emailField, emailTest, e, 'submit');
+    // run checkField function on name and email fields
+    // Pass in the field to check, the test to run, and the event
+    checkField(nameField, nameTest, e);
+    checkField(emailField, emailTest, e);
     // variable to record whether a checkbox has been checked
     let checkboxChecked;
     // loop through the checkboxes to check that at least one is checked
@@ -299,17 +325,16 @@ document.querySelector('form').addEventListener('submit', (e) => {
     if (!checkboxChecked) {
         e.preventDefault();
         valid(activities, false);
-    // if one is valid, run vavlid function to hide errors/hint
+    // if one is valid, run valid function to hide errors/hint
     } else {
         valid(activities, true);
     }
     // if 'credit card' is the selected payment method, check it's sub-fields
     if(paymentMethod.value === 'credit-card') {
-        checkField(cardNumber, cardNumberTest, e, 'submit');
-        checkField(zipCode, zipCodeTest, e, 'submit');
-        checkField(cvv, cvvTest, e, 'submit');
+        checkField(cardNumber, cardNumberTest, e);
+        checkField(zipCode, zipCodeTest, e);
+        checkField(cvv, cvvTest, e);
     }
-
 });
 
 /**
